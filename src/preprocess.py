@@ -113,23 +113,40 @@ class StandardScaler:
         """
         X_unscaled = X * self.scale_ + self.mean_
         return X_unscaled
-
-
+        
+        
 def get_dataframe():
     """
     Get the data from https://zenodo.org/record/7858848/files/02%20Dataset.csv and return the DataFrame with the raw data.
     If this fails, a message is printed and the user is asked to download the dataset manually and place it in the data folder.
     """
     try:
-        df = pd.read_csv(
+        return pd.read_csv(
             "https://zenodo.org/record/7858848/files/02%20Dataset.csv", sep=";"
         )
-        return df
     except Exception:
         print(
             "Could not download the file. Please download the dataset from https://zenodo.org/record/7858848/files/02%20Dataset.csv and place it in the data folder."
         )
     # return pd.read_csv('data/02 Dataset.csv', index_col=False, delimiter=';')
+
+
+def sort_by_age_preserve_order(df):
+    # Sort the unique IDs by Age
+    sorted_ids = df.groupby("ID")["Age"].first().sort_values()
+
+    # Create a dictionary that maps each ID to its sorted index
+    id_to_index = dict(zip(sorted_ids.index, range(len(sorted_ids))))
+
+    # Create a new column that maps each ID to its sorted index
+    df["ID_index"] = df["ID"].map(id_to_index)
+
+    # Sort the dataframe by ID_index and Age
+    df = df.sort_values(["ID_index", "Age"])
+
+    # Remove the ID_index column
+    df = df.drop(columns=["ID_index"])
+    return df
 
 
 def make_distinct_df(df):
@@ -275,6 +292,7 @@ def prepare_data():
         distinct_df (pandas.DataFrame): A DataFrame with the distinct values of the categorical variables in the original DataFrame.
     """
     df = get_dataframe()
+    df = sort_by_age_preserve_order(df)
     df = rescale(df.copy())
 
     # identifier for each participant is the ID column
