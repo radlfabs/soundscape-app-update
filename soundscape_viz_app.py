@@ -183,7 +183,8 @@ layout = column(
     plot_dict["perc_loud_plot"],
     plot_dict["pred_loud_plot"],
     plot_dict["loudness_rel_plot"],
-    
+    plot_dict["pl_pred_rel_plot"],
+    plot_dict["ev_spl_rel_plot"],
     situation_div,
     plot_dict["val_plot"],
     plot_dict["ar_plot"],

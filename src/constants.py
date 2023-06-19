@@ -46,7 +46,8 @@ USEFUL_COLUMNS = [
     "Salient_source_ownership",
     "FGsource",
     "AirTemperature",
-    "Luminosity"
+    "Luminosity",
+    "LAF5"
     ]
 
 CATEGORICAL_CMAP = (
