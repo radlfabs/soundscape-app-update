@@ -2,7 +2,28 @@
 from bokeh.models import Div
 
 
-def get_person_div(grouped_df):
+title_div = Div(
+    text="""
+    <h1>Explore the Indoor Soundscape Dataset</h1>
+    <i>by Fabian Rosenthal</i>
+    """
+)
+
+# description how the slider works
+slider_desc_div = Div(
+    text="""
+    <h3>Select one of the 105 participants using the slider at the top right.</h3>
+    <p>Participants are sorted by their age from youngest (18 years) to oldest (68 years).</p>
+    <p>Explore the person factors and their timeseries.</p>
+    <p>The plots are updated on release of the slider.</p>
+    <p>For your session, a log file is created in the app's folder.</p>
+    <p>You can mark participants and selected observations with the buttons.</p>
+    <p>This makes it easy to find outliers and remove them in EDA afterwards.</p>
+    """
+)
+
+
+def get_person_text(grouped_df):
     """
     This function creates a div that shows the person factors of the participant.
     This includes the participant ID, gender (with a sign), the age,
@@ -23,48 +44,57 @@ def get_person_div(grouped_df):
     }.get(
         grouped_df["Gender"].lower(), "Other or not answered."
     )  # question mark
+    # in df there are three variables with information about the children:
+    # 1. children: yes or no
+    # 2. children_joung: yes or no
+    # 3. children_old: yes or no
+    # make a mapper that maps the three variables to one variable with the levels (No Children, Young, Old, Both)
+    children_cat = ""
 
+    if grouped_df["Children_joung"] == "yes" and not grouped_df["Children_old"] == "yes":
+        # get a emoji for young children
+        children_cat = "Young"
+    elif grouped_df["Children_old"] == "yes" and not grouped_df["Children_joung"] == "yes":
+        # get emoji for older child
+        children_cat = "Old"
+    elif grouped_df["Children_old"] == "yes" and grouped_df["Children_joung"] == "yes":
+        # make string with baby emohi and older child emoji
+        children_cat = "Yound and old"
+    elif grouped_df["Children"] == "no":
+        children_cat = "No children"
+    
     # make a div that views the age and gender of the participant
-    person_data_div = Div(
-        text=f"""
-                              <h2>Explore the person factors.</h2>
-                              <p><b>ID:</b> {grouped_df["ID"]}</p>
-                              <p><b>Number of observations:</b> {grouped_df["n_obs_id"]}</p>
-                              <p><b>Age:</b> {grouped_df["Age"]}</p>  
-                              <p><b>Gender:</b> {gender}</p>
-                              <p><b>Number of people in household:</b> {grouped_df["People_in_household"] * "&#129489;"}</p>
-                              <p><b>Most common location:</b> {grouped_df["Common_location"]}</p>
-                              """
-    )
-    return person_data_div
+    return f"""
+            <h2>Explore the person factors.</h2>
+            <p><b>ID:</b> {grouped_df["ID"]}</p>
+            <p><b>Number of observations:</b> {grouped_df["n_obs_id"]}</p>
+            <p><b>Age:</b> {grouped_df["Age"]}</p>  
+            <p><b>Gender:</b> {gender}</p>
+            <p><b>Number of people in household:</b> {grouped_df["People_in_household"] * "&#129489;"}</p>
+            <o><b>Children:</b> {children_cat}</p>
+            <p><b>Most common location:</b> {grouped_df["Common_location"]}</p>
+            <p><b>Has been instruced by:</b> Instructor {grouped_df["Instructor"]}</p>
+            """
 
 
-title_div = Div(
-    text="""
-    <h1>Explore the Indoor Soundscape Dataset</h1>
-    <i>by Fabian Rosenthal</i>
-    """
-)
+def get_person_div(grouped_df):
+    return Div(text=get_person_text(grouped_df))
 
 # descrioption of the radar charts
 radar_desc_div = Div(
     text="""
     <p>Radar charts showing normalized values for person factors.</p>
-    <b><p>Wellbeing.</b> Visualizing the persons subjective general Health, psychological Wellbeing and Hearing Ability (measured using audiograms).</p>
-    <b><p>Noise Sensitivity.</b> Three-dimensional noise sensitivity with the dimensions Sleep, Habitation and Work as well as the average noise senstivity, Overall.</p>
+    <b><p>Wellbeing.</b> Visualizing the persons subjective general Health, psychological Wellbeing and Hearing Ability.</p>
+    <p>Hearing ability was assessed with audiograms and is encoded in three levels: 
+    <p>- Value 0 corresponds to moderate impairment on at least one ear (over 35 dB hearing loss), </p>
+    <p>- 0.5 corresponds to mild impairment on at least one ear (over 20 and under 35 dB hearing loss) and </p>
+    <p>- 1.0 corresponding to no hearing impairment (less or equal than 20 dB hearing loss).</p>
+    <b><p>Noise Sensitivity.</b> Three-dimensional noise sensitivity with the dimensions Sleep, Habitation and Work.</p>
     <b><p>Trait.</b> Three-dimensional person traits are represented by the following factors:</p><p>1) Mood (Scales from negative to positive)</p>
     <p>2) Wakefulness (scales from sleepy to wakeful)</p><p>3) Rest (scales from calm to restless).</p>
     """
 )
 
-# description how the slider works
-slider_desc_div = Div(
-    text="""
-    <h3>Select a participant using the slider at the top right.</h3>
-    <p>Explore the person factors and their study timeseries.</p>
-    <p>The plots are updated on release of the slider.</p>
-    """
-)
 
 # description of the timeseries plots of the soundscape dimensions
 time_series_div = Div(
@@ -82,8 +112,8 @@ loudness_div = Div(
     text="""
     <h2>Explore the Loudness of the Soundscapes!</h2>
     <p>Learn how the perceived and predicted loudness change over time for the selected participant and how they are related.</p>
-    <p>The perceived loudness was assessed by the participants using a combination of verbal (categorical) and slider-based (numerical) rating with a possible range from 0 to 100.</p>
-    <p>The predicted loudness is the 5 % exceedencee level in [sone] calculated from the recording using the ISO 532-1 standard.</p>
+    <p>The perceived loudness was assessed by the participants using a combination of verbal (categorical) and slider-based (numerical) rating with a possible range from 1 to 50.</p>
+    <p>The predicted loudness is the actually acoustically calculated loudness: The 5 % exceedencee level in [sone] calculated from the audio recording using the ISO 532-1 standard.</p>
     <p>Hover over the points to get further data corresponding to that observation.</p>
     """
 )
@@ -94,6 +124,18 @@ situation_div = Div(
     <h2>Explore the situation factors!</h2>
     <p>Learn about the participant's Valence and Arousal in the situation and how they are related.</p>  
     <p>Hover over the points to get further data corresponding to that observation.</p>
+    """
+)
+
+environment_div = Div(
+    text="""
+    <h2>Explore the environmental features!</h2>
+    <p>See how the environmental features change over time for the selected participant.</p>
+    <p>An unplausible plot mightindiceate problems regarding the recording device's sensors.</p>
+    <p>If the number of observations is lower than the valid oversvations, there has been NaN values in the data.</p>
+    <p>Luminosity of 0.0 might indicate converage of the light sensor.</p>
+    <p>Hover over the points to get further data corresponding to that observation.</p>
+    <p>This function is experimental. In the future we might want to apply special data cleaning to avoid empty or unplausible plots.</p>
     """
 )
 
