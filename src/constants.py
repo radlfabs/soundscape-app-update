@@ -18,6 +18,7 @@ TOOLTIPS = [
     ("Predicted Loudness", "@Predicted_Loudness{0.00}"),
 ]
 
+
 USEFUL_COLUMNS = [
     "Soundscape_pleasantness",
     "Soundscape_eventfulness",
@@ -44,7 +45,9 @@ USEFUL_COLUMNS = [
     "Sal_sound_cat",
     "Salient_source_ownership",
     "FGsource",
-]
+    "AirTemperature",
+    "Luminosity"
+    ]
 
 CATEGORICAL_CMAP = (
     "#009E73",
