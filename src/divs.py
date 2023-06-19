@@ -16,9 +16,9 @@ slider_desc_div = Div(
     <p>Participants are sorted by their age from youngest (18 years) to oldest (68 years).</p>
     <p>Explore the person factors and their timeseries.</p>
     <p>The plots are updated on release of the slider.</p>
-    <p>For your session, a log file is created in the app's folder.</p>
-    <p>You can mark participants and selected observations with the buttons.</p>
-    <p>This makes it easy to find outliers and remove them in EDA afterwards.</p>
+    <p>For your session, log files are created in the app's folder.</p>
+    <p>You can mark participants and selected observations in the logs with the buttons below the slider.</p>
+    <p>This makes it easy to find and remember outliers.</p>
     """
 )
 

@@ -25,7 +25,7 @@ For example, if you are using conda, you can activate the environment using `con
 Now we're ready to start the bokeh server by running the following command:
 
 ```bash
-bokeh serve --show soundscape_viz_app.py
+bokeh serve --show app.py
 ```
 
 Your browser should now open automatically. If it doesn't, open a new browser window and go to `localhost:5006/soundscape_viz_app`.

@@ -1,7 +1,7 @@
 # Author: Fabian Rosenthal
 # Use this module with a bokeh server to visualize the soundscape data.
 # Example usage from command line: 
-# bokeh serve --show soundscape_viz_app.py
+# bokeh serve --show app.py
 
 import os
 import sys
@@ -19,29 +19,29 @@ from bokeh.models import Div
 import preprocess as pp
 from constants import USEFUL_COLUMNS
 from constants import CATEGORICAL_CMAP
-from plot_functions import get_radar_chart
-from plot_functions import make_plot_dict
-from plot_functions import create_time_color_map
-from plot_functions import get_daily_observations_barplot
-from plot_functions import get_soundcat_barplot
-from make_divs import get_person_div
-from make_divs import get_person_text
-from make_divs import title_div
-from make_divs import radar_desc_div
-from make_divs import slider_desc_div
-from make_divs import time_series_div
-from make_divs import loudness_div
-from make_divs import situation_div
-from make_divs import environment_div
-from make_divs import citation_div
-from make_divs import thk_div
+from plotting import get_radar_chart
+from plotting import make_plot_dict
+from plotting import create_time_color_map
+from plotting import get_daily_observations_barplot
+from plotting import get_soundcat_barplot
+from divs import get_person_div
+from divs import get_person_text
+from divs import title_div
+from divs import radar_desc_div
+from divs import slider_desc_div
+from divs import time_series_div
+from divs import loudness_div
+from divs import situation_div
+from divs import environment_div
+from divs import citation_div
+from divs import thk_div
 from widgets import running_spinner
 from widgets import spinner_styles
 from widgets import get_slider
 from widgets import get_buttons
-from log_session import initialize_log
-from log_session import log_id
-from log_session import log_selection
+from session_logging import initialize_log
+from session_logging import log_id
+from session_logging import log_selection
 
 # load the data
 (
