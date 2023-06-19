@@ -1,13 +1,16 @@
 # Author: Fabian Rosenthal
 # This module contains the functions to create the bokeh plots for the soundscape visualization app.
+import re
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 from bokeh.plotting import figure
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, TapTool
 from bokeh.models import Span
+from bokeh.models import DatetimeTickFormatter
+from bokeh.models.callbacks import CustomJS
 
 from src.constants import TOOLTIPS
 
@@ -54,15 +57,15 @@ def get_daily_observations_barplot(source):
     bokeh figure
     """
     p = figure(
-        width=800, height=400, title="When does the participant make observations?"
+        width=800, height=400, title="When does the participant make observations?", tools=""
     )
     # add renderers
     p.vbar(x="x", top="counts", color="cmap", source=source, width=0.9, alpha=0.5)
 
     p.xgrid.grid_line_color = None
-    p.y_range.start = 0
-    max_count = np.max(source.data["counts"])
-    p.yaxis.ticker = np.arange(0, max_count + 1, 1)
+    # p.y_range.start = 0
+    # max_count = np.max(source.data["counts"])
+    # p.yaxis.ticker = np.arange(0, max_count + 1, 1)
 
     p.xaxis.axis_label = "Hours of the day"
     p.yaxis.axis_label = "Total observations in the study period"
@@ -93,7 +96,7 @@ def get_soundcat_barplot(source):
         "SC_Music",
     ]
 
-    p = figure(width=800, height=400, title="How is a typical soundscape composed?")
+    p = figure(width=800, height=400, title="How is a typical soundscape composed?", tools="")
 
     x_cols = [col.split("_")[1] for col in cols]
     x_ticks = [(i, col) for i, col in enumerate(x_cols)]
@@ -131,7 +134,7 @@ def get_radar_chart(
     """
 
     p = figure(
-        width=400, height=400, title=title, x_range=(-1.5, 1.5), y_range=(-1.5, 1.5)
+        width=400, height=400, title=title, x_range=(-1.5, 1.5), y_range=(-1.5, 1.5), tools=""
     )
     p.aspect_ratio = 1
 
@@ -178,7 +181,20 @@ def get_radar_chart(
     return p
 
 
-def get_timeseries_plot(source, view, title):
+def format_title(title):
+    # Split the title at every capital letter and join with spaces
+    title = " ".join(re.findall('[A-Z][^A-Z]*', title.replace("_", " ")))
+    # Capitalize the first letter of each word
+    title = title.title()
+    return title
+
+
+def callback_func(trigger_counter):
+    global current_selection
+    current_selection = trigger_counter
+
+
+def get_timeseries_plot(source, view, title, color="navy", *args, **kwargs):
     """
     This function creates a timeseries plot with a datetime axis type.
 
@@ -190,19 +206,16 @@ def get_timeseries_plot(source, view, title):
     Returns:
         bokeh figure: A bokeh figure with the timeseries plot
     """
-
-    # make a pretty title string
-    # remove the underscored from the column name and capitalize words
-    pretty_title = " ".join([word.capitalize() for word in title.split("_")])
-
+    
+    pretty_title = format_title(title)
     # create a new plot with a datetime axis type
     p = figure(width=800, height=350, x_axis_type="datetime", title=pretty_title)
 
     # Add the circle glyph with tooltips
     circle_glyph = p.circle(
-        x="Time", y=title, color="navy", alpha=0.5, source=source, view=view, size=10
+        x="Time", y=title, color=color, alpha=0.5, source=source, view=view, size=10
     )
-    hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS)
+    hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS, mode="vline")
     p.add_tools(hover_tool)
 
     # Add zero grid lines
@@ -219,10 +232,12 @@ def get_timeseries_plot(source, view, title):
 
     # add x-axis label
     p.xaxis.axis_label = "Date"
+    p.xaxis.formatter = DatetimeTickFormatter(days=r"%d.%m.%Y")
+
     return p
 
 
-def get_rel_plot(source, view, cols):
+def get_rel_plot(source, view, cols, *args, **kwargs):
     """
     This function creates a scatter plot to show the relationship between two columns of the dataset.
 
@@ -237,20 +252,35 @@ def get_rel_plot(source, view, cols):
 
     # for the columns "Soundscape_pleasantness", "Soundscape_eventfulness" make a scatter plot of their relation
 
-    x_title = " ".join([word.capitalize() for word in cols[0].split("_")])
-    y_title = " ".join([word.capitalize() for word in cols[1].split("_")])
-
+    x_title = format_title(cols[0])
+    y_title = format_title(cols[1])
     # create a new plot with a datetime axis type
-    p = figure(width=500, height=500, title=f"{x_title} vs {y_title}")
+    p = figure(width=500, height=500, title=f"{y_title} vs {x_title}")
     p.hover.tooltips = TOOLTIPS
 
     # add renderers
     circle_glyph = p.circle(
         x=cols[0], y=cols[1], color="navy", alpha=0.5, source=source, view=view, size=10
     )
-    hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS)
+    hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS, mode="vline")
     p.add_tools(hover_tool)
+    
+    # Create the TapTool and add the callback
+    tap_tool = TapTool()
 
+    tap_tool.callback = CustomJS(code="""
+        // Get the selected patch
+        var selected_index = cb_obj.selected['1d'].indices[0];
+        
+        // Get the value from your data or wherever you have stored it
+        var trigger_counter = source.data['Trigger_counter'][selected_index];
+        
+        // Store the value in the variable
+        Bokeh.documents[0].root.variables.trigger_counter = trigger_counter;
+    """)
+
+    p.add_tools(tap_tool)
+    
     # add axis labels
     p.xaxis.axis_label = x_title
     p.yaxis.axis_label = y_title
@@ -273,3 +303,26 @@ def get_rel_plot(source, view, cols):
     p.add_layout(zero_line_horizontal)
     p.add_layout(zero_line_vertical)
     return p
+
+
+def make_plot_dict(cds, view):
+    plot_mapper = {
+    "ev_plot": (get_timeseries_plot, "Soundscape_eventfulness", "orange"),
+    "pl_plot": (get_timeseries_plot, "Soundscape_pleasantness", "orangered"),
+    "ev_pl_rel_plot": (get_rel_plot, ["Soundscape_eventfulness", "Soundscape_pleasantness"], "orange"),
+    "perc_loud_plot": (get_timeseries_plot, "Perceived_loudness", "rosybrown"),
+    "pred_loud_plot": (get_timeseries_plot, "Predicted_Loudness", "salmon"),
+    "loudness_rel_plot": (get_rel_plot, ["Predicted_Loudness", "Perceived_loudness"], "rosybrown"),
+    "val_plot": (get_timeseries_plot, "Valence", "goldenrod"),
+    "ar_plot": (get_timeseries_plot, "Arousal", "mediumvioletred"),
+    "val_ar_rel_plot": (get_rel_plot, ["Valence", "Arousal"], "goldenrod"),
+    "temp_plot": (get_timeseries_plot, "AirTemperature", "darkorange"),
+    "lumin_plot": (get_timeseries_plot, "Luminosity", "darkorange"),
+    }
+    tap_tool = TapTool()
+    plot_dict = {}
+    for plot_name, (plot_func, plot_col, color) in plot_mapper.items():
+        plot_dict[plot_name] = plot_func(cds, view, plot_col, color=color)
+        plot_dict[plot_name].add_tools(tap_tool)
+        
+    return plot_dict
