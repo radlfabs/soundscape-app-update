@@ -182,6 +182,8 @@ def get_radar_chart(
 
 
 def format_title(title):
+    if title == "LAF5":
+        return title
     # Split the title at every capital letter and join with spaces
     title = " ".join(re.findall('[A-Z][^A-Z]*', title.replace("_", " ")))
     # Capitalize the first letter of each word
@@ -313,6 +315,8 @@ def make_plot_dict(cds, view):
     "perc_loud_plot": (get_timeseries_plot, "Perceived_loudness", "rosybrown"),
     "pred_loud_plot": (get_timeseries_plot, "Predicted_Loudness", "salmon"),
     "loudness_rel_plot": (get_rel_plot, ["Predicted_Loudness", "Perceived_loudness"], "rosybrown"),
+    "pl_pred_rel_plot": (get_rel_plot, ["Predicted_Loudness", "Soundscape_pleasantness"], "limegreen"),
+    "ev_spl_rel_plot": (get_rel_plot, ["LAF5", "Soundscape_eventfulness"], " deeppink"),
     "val_plot": (get_timeseries_plot, "Valence", "goldenrod"),
     "ar_plot": (get_timeseries_plot, "Arousal", "mediumvioletred"),
     "val_ar_rel_plot": (get_rel_plot, ["Valence", "Arousal"], "goldenrod"),
