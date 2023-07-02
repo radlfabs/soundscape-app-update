@@ -361,7 +361,7 @@ def prepare_data():
     df.index = int_indices
 
     # convert Form_finish_time to datetime ad format as %d.%m.%Y
-    df["Time"] = pd.to_datetime(df["Form_finish_time"], dayfirst=True)
+    df["Time"] = pd.to_datetime(df["Form_finish_time"])  #, dayfirst=True)
 
     counts_array = compute_hourly_counts_per_id(df.copy())
 
