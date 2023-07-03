@@ -28,7 +28,18 @@ Now we're ready to start the bokeh server by running the following command:
 bokeh serve --show app.py
 ```
 
-Your browser should now open automatically. If it doesn't, open a new browser window and go to `localhost:5006/soundscape_viz_app`.
+Your command line should output something like this
+
+```bash
+`Starting Bokeh server version 3.1.1 (running on Tornado 6.2)
+2023-07-02 06:07:48,262 User authentication hooks NOT provided (default user enabled)
+2023-07-02 06:07:48,278 Bokeh app running at: http://localhost:5006/main
+2023-07-02 06:07:48,278 Starting Bokeh server with process id: 17576
+2023-07-02 06:07:52,951 WebSocket connection opened
+2023-07-02 06:07:52,967 ServerConnection created
+```
+
+and your browser should now open automatically. If it doesn't, you can simply open a new browser window and go to `localhost:5006/app`.
 
 ### Loading and preprocessing
 
@@ -38,13 +49,11 @@ If you want to load the data from scratch, delete the `data/data.pickle` file.
 
 ### Using the app
 
-###### When it's done, you should see the following:
+###### When your app is ready to explore, you should see the following:
 
-![1686253675104](image/README/1686253675104.png)
+![1688377560280](image/README/1688377560280.png)
 
-The slider in the top right lets you select the participant. The plots and bvalues will update on release of the slider automatically.
-
-After selecting the participant you are able to explore
+The slider in the top right lets you select the participant. The plots and values will update on release of the slider automatically. We will have a look at the use of the buttons later.selecting the participant you are able to explore
 
 - person factors,
 - an activity profile,
@@ -59,3 +68,7 @@ After selecting the participant you are able to explore
 <img src="image/README/1686254338655.png" width="880">
 
 Have fun exploring the diverse participantsy and their subjective ratings in the dataset interactively!
+
+### Logging
+
+You have the possibility to mark people or data points that are useful for you. A logfile is created in the background for every session. It is in the `/logs` folder. It will include every slider change, so you have a history of what you looked at. Also you can mark special participants in the log file by using the button `Log Participant`. And when data points are currently selected you can also log the keys corresponding to the data in the original table by using the `Log Selection` button. For the button, outputs we also create a `.csv` file, so you can easily access these logged information and incorporate them in filtering processes working with the data.
