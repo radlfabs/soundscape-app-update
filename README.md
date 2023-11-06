@@ -1,11 +1,11 @@
-# Data Visualization for Indoor Soundscape Dataset
+# Spotlighting the Participant: An Interactive Bokeh Visualization App for Soundscape Data Exploration
 
 Author: Fabian Rosenthal
 
 This repo creates an interactive data visualization app using bokeh for python. It builds on the study dataset by Versümer, Steffens and Rosenthal (2023): See [researchgate](https://www.researchgate.net/publication/369062819_Extensive_crowdsourced_dataset_of_in-situ_evaluated_binaural_soundscapes_of_private_dwellings_containing_subjective_sound-related_and_situational_ratings_along_with_person_factors_to_study_time-varyin) and [Zenodo](10.5281/zenodo.7858848).
 The app make the large crowdsourced dataset accessible and explorable from the perspective of the participants. It allows to explore the subjective ratings in a more intuitive way than with traditional statistical methods and get a better understanding of the diversity of the data.
 
-This contribution was developed as a project for the Data Visualization course with Konrad Förstner at University of Applied Sciences Cologne.
+This contribution was developed as a project for the Data Visualization course with Konrad Förstner at University of Applied Sciences Cologne. See the technical report at [researchgate](https://www.researchgate.net/publication/372214407_Spotlighting_the_Participant_An_Interactive_Bokeh_Visualization_App_for_Soundscape_Data_Exploration).
 
 # Getting started
 
