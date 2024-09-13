@@ -9,6 +9,7 @@ The app then only needs to select the data to plot from the dataframe.
 """
 
 from os.path import exists
+import os
 import pickle
 import logging
 
@@ -427,6 +428,8 @@ def load_data():
         logger.info("Downloading and preparing data...")
         # if the data was not pickled successfully, prepare the data
         pickle_tuple = prepare_data()
+        # Ensure the directory exists
+        os.makedirs("data", exist_ok=True)
         # pickle the data
         with open("data/data.pickle", "wb") as f:
             pickle.dump(pickle_tuple, f)
