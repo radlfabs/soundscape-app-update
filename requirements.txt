@@ -1,3 +1,4 @@
 bokeh
 numpy    
 pandas
+matplotlib
