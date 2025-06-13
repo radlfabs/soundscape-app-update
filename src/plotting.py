@@ -214,7 +214,7 @@ def get_timeseries_plot(source, view, title, color="navy", *args, **kwargs):
     p = figure(width=800, height=350, x_axis_type="datetime", title=pretty_title)
 
     # Add the circle glyph with tooltips
-    circle_glyph = p.circle(
+    circle_glyph = p.scatter(
         x="Time", y=title, color=color, alpha=0.5, source=source, view=view, size=10
     )
     hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS, mode="vline")
@@ -261,7 +261,7 @@ def get_rel_plot(source, view, cols, *args, **kwargs):
     p.hover.tooltips = TOOLTIPS
 
     # add renderers
-    circle_glyph = p.circle(
+    circle_glyph = p.scatter(
         x=cols[0], y=cols[1], color="navy", alpha=0.5, source=source, view=view, size=10
     )
     hover_tool = HoverTool(renderers=[circle_glyph], tooltips=TOOLTIPS, mode="vline")
