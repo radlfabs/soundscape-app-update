@@ -15,107 +15,13 @@ import logging
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from src.constants import TITLE_LABEL_MAPPER
+from constants import TITLE_LABEL_MAPPER, MINMAX_COLS, ZSCALE_COLS, WELLBEING_COLS, TRAIT_COLS, NOISE_SENSE_COLS
 
 logger = logging.getLogger(__name__)
 
-class MinMaxScaler:
-    """
-    A class to scale the data to a range of 0 to 1.
-    This is re-implemented because to avoid the sklearn dependency.
-    """
 
-    def __init__(self, feature_range=(0, 1)):
-        self.min = feature_range[0]
-        self.max = feature_range[1]
-
-    def fit(self, X):
-        self.data_min_ = X.min(axis=0)
-        self.data_max_ = X.max(axis=0)
-        self.data_range_ = self.data_max_ - self.data_min_
-        self.n_samples_seen_, self.n_features_in_ = X.shape
-        try:
-            self.feature_names_in_ = X.columns
-        except AttributeError:
-            # X might not be a DataFrame or Series
-            pass
-
-    def fit_transform(self, X):
-        """
-        Fit the scaler to the data and transform the data.
-        Returns the scaled data.
-        """
-        self.fit(X)
-        self.X_std = (X - self.data_min_) / self.data_range_
-        X_scaled = self.X_std * (self.max - self.min) + self.min
-        return X_scaled
-
-    def transform(self, X):
-        """
-        Scale features of X according to feature_range.
-        Returns the scaled data.
-        """
-        X_scaled = (X - self.data_min_) / self.data_range_
-        X_scaled = X_scaled * (self.max - self.min) + self.min
-        return X_scaled
-
-    def inverse_transform(self, X):
-        """
-        Undo the scaling of X according to feature_range.
-        Returns the unscaled data.
-        """
-        X_unscaled = (X - self.min) / (self.max - self.min)
-        X_unscaled = X_unscaled * self.data_range_ + self.data_min_
-        return X_unscaled
-
-
-class StandardScaler:
-    """
-    A class to scale the data to a z-score by removing the mean and scaling to unit variance.
-    This is re-implemented because to avoid the sklearn dependency.
-    """
-
-    def __init__(self):
-        pass
-
-    def fit(self, X):
-        self.mean_ = X.mean(axis=0)
-        self.var_ = X.var(axis=0)
-        self.scale_ = np.sqrt(self.var_)
-        self.n_samples_seen_, self.n_features_in_ = X.shape
-        try:
-            self.feature_names_in_ = X.columns
-        except AttributeError:
-            # X might not be a DataFrame or Series
-            pass
-
-    def fit_transform(self, X):
-        """
-        Fit the scaler to the data and transform the data.
-        Returns the scaled data.
-        """
-        self.fit(X)
-        X_scaled = (X - self.mean_) / self.scale_
-        return X_scaled
-
-    def transform(self, X):
-        """
-        Scale features of X according to feature_range.
-        Returns the scaled data.
-        """
-        X_scaled = (X - self.mean_) / self.scale_
-        return X_scaled
-
-    def inverse_transform(self, X):
-        """
-        Undo the scaling of X according to feature_range.
-        Returns the unscaled data.
-        """
-        X_unscaled = X * self.scale_ + self.mean_
-        return X_unscaled
-        
-        
 def get_dataframe():
     """
     Get the data from https://zenodo.org/record/7858848/files/02%20Dataset.csv and return the DataFrame with the raw data.
@@ -191,33 +97,14 @@ def rescale(df):
     Rounds all float columns in df to 2 decimals.
     Returns the rescaled and rounded DataFrame.
     """
-
-    minmax_cols = [
-        "Health",
-        "Wellbeing",
-        "Anxiety",
-        "Hearing_impairment",
-        "Noise_sensitivity_sleep",
-        "Noise_sensitivity_work",
-        "Noise_sensitivity_habit",
-        "Trait_mood",
-        "Trait_wakefulness",
-        "Trait_rest",
-        "Control",
-        "Cognitive_load",
-        "Physical_load",
-    ]
+    
+    df = df.astype({col: float for col in MINMAX_COLS})
+    
     mm_scaler = MinMaxScaler()
-    df.loc[:, minmax_cols] = mm_scaler.fit_transform(df.loc[:, minmax_cols])
+    df.loc[:, MINMAX_COLS] = mm_scaler.fit_transform(df.loc[:, MINMAX_COLS])
 
-    cols_to_zscale = [
-        "Valence",
-        "Arousal",
-        "Soundscape_eventfulness",
-        "Soundscape_pleasantness",
-    ]
     std_scaler = StandardScaler()
-    df.loc[:, cols_to_zscale] = std_scaler.fit_transform(df.loc[:, cols_to_zscale])
+    df.loc[:, ZSCALE_COLS] = std_scaler.fit_transform(df.loc[:, ZSCALE_COLS])
     # round all float columns in df to 2 decimals
     df = df.round(2)
     return df
@@ -234,33 +121,19 @@ def make_wellbeing_data(df):
     return (
         df.assign(Resilience=lambda x: 1 - x["Anxiety"])
         .assign(Hearing_ability=lambda x: 1 - x["Hearing_impairment"])
-        .loc[
-            :,
-            [
-                "Health",
-                "Wellbeing",
-                "Resilience",
-                "Hearing_ability",
-            ],
-        ]
+        .loc[:, WELLBEING_COLS]
     )
 
 
 def make_noise_sense_data(df):
     """Returns a DataFrame with the columns Noise_sensitivity_sleep, Noise_sensitivity_work, Noise_sensitivity_habit."""
-
-    properties = [
-        "Noise_sensitivity_sleep",
-        "Noise_sensitivity_work",
-        "Noise_sensitivity_habit",
-    ]
-    return df.loc[:, properties]
+    return df.loc[:, NOISE_SENSE_COLS]
 
 
 def make_traits_radar(df):
     """Returns a DataFrame with the columns Trait_mood, Trait_wakefulness, Trait_rest."""
-    properties = ["Trait_mood", "Trait_wakefulness", "Trait_rest"]
-    return df.loc[:, properties]
+
+    return df.loc[:, TRAIT_COLS]
 
 
 def get_dataframe_dict(df):

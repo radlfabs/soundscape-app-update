@@ -75,3 +75,45 @@ TITLE_LABEL_MAPPER = {
         "Rest",
     ],
 }
+
+MINMAX_COLS = [
+    "Health",
+    "Wellbeing",
+    "Anxiety",
+    "Hearing_impairment",
+    "Noise_sensitivity_sleep",
+    "Noise_sensitivity_work",
+    "Noise_sensitivity_habit",
+    "Trait_mood",
+    "Trait_wakefulness",
+    "Trait_rest",
+    "Control",
+    "Cognitive_load",
+    "Physical_load",
+]
+
+ZSCALE_COLS = [
+    "Valence",
+    "Arousal",
+    "Soundscape_eventfulness",
+    "Soundscape_pleasantness",
+]
+
+WELLBEING_COLS = [
+    "Health",
+    "Wellbeing",
+    "Resilience",
+    "Hearing_ability",
+]
+
+NOISE_SENSE_COLS = [
+    "Noise_sensitivity_sleep",
+    "Noise_sensitivity_work",
+    "Noise_sensitivity_habit",
+]
+
+TRAIT_COLS = [
+    "Trait_mood", 
+    "Trait_wakefulness", 
+    "Trait_rest"
+]
